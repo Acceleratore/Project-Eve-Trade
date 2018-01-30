@@ -12,3 +12,9 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_actionManage_characters_triggered()
+{
+    //ManageCharacters wMC;
+    MainWindow::wMC.show();
+}
