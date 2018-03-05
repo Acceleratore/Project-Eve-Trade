@@ -13,7 +13,6 @@ class MainWindow : public QMainWindow
     ManageCharacters wMC;
 public:
     explicit MainWindow(QWidget *parent = 0);
-    void CreateMCW();
     ~MainWindow();
 
 private:
