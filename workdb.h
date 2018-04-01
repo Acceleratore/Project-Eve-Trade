@@ -4,26 +4,38 @@
 #include <QtSql>
 #include "QSqlQuery"
 
-QSqlError InitDB()
+class QUserDBWork
 {
     QSqlDatabase db;
 
-    db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("M:\\ProjectEVET.sqlite");
+    public:
+    QUserDBWork();
+    ~QUserDBWork();
+    QSqlError InitDB (QString _NameDriver, QString _NameDB);
+    QSqlQuery GetListCharacters();
+
+};
+
+
+QSqlError QUserDBWork::InitDB(QString _NameDriver, QString _NameDB)
+{
+
+    db = QSqlDatabase::addDatabase(_NameDriver);
+    db.setDatabaseName(_NameDB);
 
     if (!db.open())
         return db.lastError();
 
     return QSqlError();
 }
-/*
-QSqlError GetListCharacters(QTableWidget *_TbW)
+
+//Запрос списка персонажей в БД
+QSqlQuery QUserDBWork::GetListCharacters()
 {
+    QSqlQuery query(db);
+    query.exec("SELECT * FROM \"Characters\"");
 
-
-
-    return QSqlError();
+    return query;
 }
-*/
 
 #endif // WORKDB_H
