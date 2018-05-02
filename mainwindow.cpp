@@ -7,21 +7,40 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
     //Проверка на наличия драйвера SQLITE
     if (!QSqlDatabase::drivers().contains("QSQLITE"))
         QMessageBox::critical(this, "Unable to load database", "Для работы необходим SQLITE драйвер");
 
     QUserDBWork CharactersDB("QSQLITE");
 
+    QString PathToDB = "";
+
+    bool DEBUG_MODE = false;
+
+    #ifndef QT_NO_DEBUG
+        DEBUG_MODE = true;
+    #endif
+
+    //Для упрощения отладки, перед релизом можно убрать
+    if (DEBUG_MODE)
+    {
+        PathToDB = PRO_FILE_PWD;
+    } else
+    {
+        PathToDB = QCoreApplication::applicationDirPath();
+    }
+
+    QMessageBox::warning(this, "DEBUG", PathToDB);
+
     //Инициализация ДБ
-    QSqlError err = CharactersDB.InitDB("M:\\ProjectEVET.sqlite");
+    QSqlError err = CharactersDB.InitDB(PathToDB+"/ProjectEVET.sqlite");
     if (err.type() != QSqlError::NoError)
     {
         QMessageBox::critical(this, "Неудачная попытка инициализации базы данных", "Не удалось инициализаровать базу данных, ошибка №: " + err.text());
         return;
     }
 
+    //Заполнение таблицы персонажей
     MainWindow::wMC.SetDataInCharTable(CharactersDB.GetListCharacters());
 
 }
