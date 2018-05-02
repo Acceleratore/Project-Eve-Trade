@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 #include <QMainWindow>
 #include "managecharacters.h"
+#include "workdb.h"
 
 namespace Ui {
 class MainWindow;

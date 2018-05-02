@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QtWidgets>
-#include "workdb.h"
+#include "QSqlQuery"
 
 namespace Ui {
 class ManageCharacters;

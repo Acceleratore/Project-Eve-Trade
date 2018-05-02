@@ -31,6 +31,13 @@ void ManageCharacters::SetDataInCharTable(QSqlQuery _Query)
     IndChr = ui->tableWidget->rowCount();
     ui->tableWidget->insertRow(IndChr);
 
+    while (_Query.next())
+    {
+        QTableWidgetItem *item1 = new QTableWidgetItem();
+        item1->setText(_Query.value(0).toString());
+        ui->tableWidget->setItem(IndChr, 0, item1);
+    }
+
     //Нужно другое решение
     /*
     QTableWidgetItem *item1 = new QTableWidgetItem();
@@ -46,4 +53,3 @@ void ManageCharacters::SetDataInCharTable(QSqlQuery _Query)
     ui->tableWidget->setItem(IndChr, 2, item3);
     */
 }
-
