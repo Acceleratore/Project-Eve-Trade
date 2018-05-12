@@ -39,14 +39,26 @@
      <attribute name="title">
       <string>Главня страница</string>
      </attribute>
-     <widget class="QTextEdit" name="textEdit">
+     <widget class="QWebEngineView" name="m_webview" native="true">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
-        <width>411</width>
-        <height>261</height>
+        <y>60</y>
+        <width>901</width>
+        <height>471</height>
        </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
       </property>
      </widget>
     </widget>
@@ -106,6 +118,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QWebEngineView</class>
+   <extends>QWidget</extends>
+   <header>qwebengineview.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

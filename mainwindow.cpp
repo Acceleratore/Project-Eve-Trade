@@ -30,8 +30,6 @@ MainWindow::MainWindow(QWidget *parent) :
         PathToDB = QCoreApplication::applicationDirPath();
     }
 
-    QMessageBox::warning(this, "DEBUG", PathToDB);
-
     //Инициализация ДБ
     QSqlError err = CharactersDB.InitDB(PathToDB+"/ProjectEVET.sqlite");
     if (err.type() != QSqlError::NoError)
@@ -43,7 +41,13 @@ MainWindow::MainWindow(QWidget *parent) :
     //Заполнение таблицы персонажей
     MainWindow::wMC.SetDataInCharTable(CharactersDB.GetListCharacters());
 
+
+    ui->m_webview->load(QUrl("https://google.ru/"));
+    ui->m_webview->show();
+
 }
+
+
 
 MainWindow::~MainWindow()
 {
