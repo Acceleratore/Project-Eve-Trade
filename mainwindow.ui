@@ -39,26 +39,40 @@
      <attribute name="title">
       <string>Главня страница</string>
      </attribute>
-     <widget class="QWebEngineView" name="m_webview" native="true">
+     <widget class="QComboBox" name="ChoiseCharComboBox">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>60</y>
-        <width>901</width>
-        <height>471</height>
+        <x>720</x>
+        <y>30</y>
+        <width>201</width>
+        <height>22</height>
        </rect>
       </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>720</x>
+        <y>10</y>
+        <width>201</width>
+        <height>20</height>
+       </rect>
       </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
+      <property name="text">
+       <string>Персонаж:</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="LoginSSOButton">
+      <property name="geometry">
+       <rect>
+        <x>724</x>
+        <y>60</y>
+        <width>191</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Зайти в ESI</string>
       </property>
      </widget>
     </widget>
@@ -118,14 +132,6 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>QWebEngineView</class>
-   <extends>QWidget</extends>
-   <header>qwebengineview.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

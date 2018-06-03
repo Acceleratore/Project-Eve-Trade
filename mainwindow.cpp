@@ -39,19 +39,17 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     //Заполнение таблицы персонажей
-    MainWindow::wMC.SetDataInCharTable(CharactersDB.GetListCharacters());
+    //MainWindow::wMC.SetDataInCharTable(CharactersDB.GetListCharacters());
 
-
-    ui->m_webview->load(QUrl("https://google.ru/"));
-    ui->m_webview->show();
+    wWSSOL = new WebSSOLogin();
+    connect(ui->LoginSSOButton, SIGNAL(clicked()), wWSSOL, SLOT(ShowLogin()), Qt::UniqueConnection);
 
 }
-
-
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete wWSSOL;
 }
 
 void MainWindow::on_actionManage_characters_triggered()

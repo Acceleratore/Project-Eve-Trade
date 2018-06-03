@@ -25,13 +25,16 @@ DEFINES += PRO_FILE_PWD=$$sprintf("\"\\\"%1\\\"\"", $$_PRO_FILE_PWD_)
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    managecharacters.cpp
+    managecharacters.cpp \
+    webssologin.cpp
 
 HEADERS += \
         mainwindow.h \
     managecharacters.h \
-    workdb.h
+    workdb.h \
+    webssologin.h
 
 FORMS += \
         mainwindow.ui \
-    managecharacters.ui
+    managecharacters.ui \
+    webssologin.ui

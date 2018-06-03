@@ -38,11 +38,6 @@
      <string>Key ID</string>
     </property>
    </column>
-   <column>
-    <property name="text">
-     <string>Verification code</string>
-    </property>
-   </column>
   </widget>
   <widget class="QPushButton" name="pushButton_add">
    <property name="geometry">

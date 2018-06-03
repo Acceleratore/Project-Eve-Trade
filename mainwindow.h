@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include "managecharacters.h"
 #include "workdb.h"
+#include "webssologin.h"
 
 namespace Ui {
 class MainWindow;
@@ -12,6 +13,8 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
     ManageCharacters wMC;
+    QDialog *wWSSOL = 0;
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
