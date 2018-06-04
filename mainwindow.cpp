@@ -41,15 +41,20 @@ MainWindow::MainWindow(QWidget *parent) :
     //Заполнение таблицы персонажей
     //MainWindow::wMC.SetDataInCharTable(CharactersDB.GetListCharacters());
 
+    InitialLoginWindow();
+
+}
+
+void MainWindow::InitialLoginWindow()
+{
     wWSSOL = new WebSSOLogin();
     connect(ui->LoginSSOButton, SIGNAL(clicked()), wWSSOL, SLOT(ShowLogin()), Qt::UniqueConnection);
-
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete wWSSOL;
+    delete wWSSOL; //Если уничтожать окно при закрытии, то не нужно
 }
 
 void MainWindow::on_actionManage_characters_triggered()
@@ -87,4 +92,9 @@ QSqlQuery QUserDBWork::GetListCharacters()
     query.exec("SELECT * FROM \"Characters\"");
 
     return query;
+}
+
+void MainWindow::on_LoginSSOButton_clicked()
+{
+    InitialLoginWindow();
 }

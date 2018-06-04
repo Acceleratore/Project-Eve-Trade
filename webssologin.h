@@ -23,6 +23,12 @@ public slots:
 private:
     Ui::WebSSOLogin *ui;
     QWebEngineView *LoginWebView = 0;
+
+    static const QString SSOAddress;
+    static const QString ReponseType;
+    static const QString RedirectURL;
+    static const QString ClientID;
+
 };
 
 #endif // WEBSSOLOGIN_H
