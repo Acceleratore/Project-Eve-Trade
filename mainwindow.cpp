@@ -7,6 +7,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    bool DEBUG_MODE = false;
+
+    #ifndef QT_NO_DEBUG
+        DEBUG_MODE = true;
+    #endif
+
     //Проверка на наличия драйвера SQLITE
     if (!QSqlDatabase::drivers().contains("QSQLITE"))
         QMessageBox::critical(this, "Unable to load database", "Для работы необходим SQLITE драйвер");
@@ -14,12 +20,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QUserDBWork CharactersDB("QSQLITE");
 
     QString PathToDB = "";
-
-    bool DEBUG_MODE = false;
-
-    #ifndef QT_NO_DEBUG
-        DEBUG_MODE = true;
-    #endif
 
     //Для упрощения отладки, перед релизом можно убрать
     if (DEBUG_MODE)
@@ -39,22 +39,24 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     //Заполнение таблицы персонажей
-    //MainWindow::wMC.SetDataInCharTable(CharactersDB.GetListCharacters());
+    MainWindow::wMC.SetDataInCharTable(CharactersDB.GetListCharacters());
 
     InitialLoginWindow();
 
 }
 
+//Инициализация окна с логином по SSO
 void MainWindow::InitialLoginWindow()
 {
-    wWSSOL = new WebSSOLogin();
+    wWSSOL = new WebSSOLogin(this);
     connect(ui->LoginSSOButton, SIGNAL(clicked()), wWSSOL, SLOT(ShowLogin()), Qt::UniqueConnection);
+    connect( wWSSOL, SIGNAL(ReturnToken(QString)), this, SLOT(GetToken(QString)) );
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete wWSSOL; //Если уничтожать окно при закрытии, то не нужно
+    delete wWSSOL;
 }
 
 void MainWindow::on_actionManage_characters_triggered()
@@ -97,4 +99,15 @@ QSqlQuery QUserDBWork::GetListCharacters()
 void MainWindow::on_LoginSSOButton_clicked()
 {
     InitialLoginWindow();
+}
+
+void MainWindow::GetToken(QString str)
+{
+
+    QMessageBox::information(
+        this,
+        trUtf8( "Ответ сервера" ),
+        str,
+        QMessageBox::Ok
+    );
 }

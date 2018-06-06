@@ -26,6 +26,7 @@ private:
 private slots:
     void on_actionManage_characters_triggered();
     void on_LoginSSOButton_clicked();
+    void GetToken(QString str);
 };
 
 #endif // MAINWINDOW_H
