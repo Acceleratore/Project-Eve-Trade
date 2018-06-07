@@ -9,6 +9,11 @@
 #include "QNetworkAccessManager"
 #include "QByteArray"
 #include "QNetworkRequest"
+#include "QJsonObject"
+#include "QJsonDocument"
+#include <QSslConfiguration>
+#include <QList>
+#include <QSslError>
 
 namespace Ui {
 class WebSSOLogin;
@@ -26,6 +31,7 @@ public slots:
     void WaitUrl(const QUrl &url);
     void GetResponse(QNetworkReply *reply);
     void slotError(QNetworkReply::NetworkError tcode);
+    void slotSSLError(QList<QSslError> ListError);
 signals:
     void ReturnToken(QString str);
 private:
