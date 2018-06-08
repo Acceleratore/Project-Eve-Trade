@@ -13,16 +13,6 @@
   <property name="windowTitle">
    <string>Вход по SSO</string>
   </property>
-  <widget class="QLineEdit" name="lineEdit">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>870</y>
-     <width>771</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
  </widget>
  <resources/>
  <connections/>

@@ -14,6 +14,7 @@
 #include <QSslConfiguration>
 #include <QList>
 #include <QSslError>
+#include "logger.h"
 
 namespace Ui {
 class WebSSOLogin;
@@ -32,6 +33,7 @@ public slots:
     void GetResponse(QNetworkReply *reply);
     void slotError(QNetworkReply::NetworkError tcode);
     void slotSSLError(QList<QSslError> ListError);
+    void slotSSLError2(QNetworkReply*, QList<QSslError>);
 signals:
     void ReturnToken(QString str);
 private:

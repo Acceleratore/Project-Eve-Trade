@@ -26,13 +26,15 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     managecharacters.cpp \
-    webssologin.cpp
+    webssologin.cpp \
+    logger.cpp
 
 HEADERS += \
         mainwindow.h \
     managecharacters.h \
     workdb.h \
-    webssologin.h
+    webssologin.h \
+    logger.h
 
 FORMS += \
         mainwindow.ui \

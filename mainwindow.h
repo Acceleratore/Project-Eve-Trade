@@ -4,6 +4,7 @@
 #include "managecharacters.h"
 #include "workdb.h"
 #include "webssologin.h"
+#include "logger.h"
 
 namespace Ui {
 class MainWindow;

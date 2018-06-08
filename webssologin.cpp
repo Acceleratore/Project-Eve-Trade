@@ -17,6 +17,7 @@ WebSSOLogin::WebSSOLogin(QWidget *parent) :
     Net_Manager = new QNetworkAccessManager( this );
 
     connect(Net_Manager, SIGNAL(finished(QNetworkReply*)) , this, SLOT(GetResponse(QNetworkReply*)));
+    connect(Net_Manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(slotSSLError2(QNetworkReply*,QList<QSslError>)));
 }
 
 WebSSOLogin::~WebSSOLogin()
@@ -86,12 +87,11 @@ void WebSSOLogin::WaitUrl(const QUrl &url)
         Request.setRawHeader("Authorization", QString("Basic "+AuthStr.toLatin1().toBase64()).toUtf8());
         Request.setHeader( QNetworkRequest::ContentTypeHeader, "application/json" );
 
-        QSslConfiguration sslConfig = Request.sslConfiguration();
+        QSslConfiguration sslConfig = QSslConfiguration::defaultConfiguration();
+        //QList<QSslCertificate> ca_new = QSslCertificate::fromData("CaCertificates");
         sslConfig.setProtocol(QSsl::SslV3);
+        //sslConfig.setCaCertificates(ca_new);
         Request.setSslConfiguration(sslConfig);
-
-
-        //Request.setSslConfiguration( QSslConfiguration:: );
 
         //Данные запроса
         QJsonObject QueryJsonPOST;
@@ -99,9 +99,9 @@ void WebSSOLogin::WaitUrl(const QUrl &url)
         QueryJsonPOST.insert("code", QJsonValue::fromVariant(AccessToken));
         QJsonDocument JsonDoc(QueryJsonPOST);
 
-
+        QNetworkReply *reply = nullptr;
         //Отправка запроса
-        QNetworkReply *reply = Net_Manager->post(Request, JsonDoc.toBinaryData());
+        reply = Net_Manager->post(Request, JsonDoc.toBinaryData());
 
 
         //ТЕСТ
@@ -116,7 +116,7 @@ void WebSSOLogin::WaitUrl(const QUrl &url)
 
         //Соединение сигнала ошибок с слотом обработки ошибки при отправке
         connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(slotError(QNetworkReply::NetworkError)));
-        connect(reply, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(slotSSLError(QList<QSslError>)));
+        connect(reply, SIGNAL(sslErrors(QList<QSslError>)),        this, SLOT(slotSSLError(QList<QSslError>)));
 
         LoginWebView->close();
     }
@@ -127,13 +127,15 @@ void WebSSOLogin::GetResponse(QNetworkReply *reply)
 {
     QByteArray *DataPOSTToken = new QByteArray(reply->readAll());
     QString tmp = DataPOSTToken->data();
-
+/*
     QMessageBox::information(
         this,
         trUtf8( "Ответ сервера" ),
         tmp,
         QMessageBox::Ok
     );
+*/
+    qDebug(logDebug) << "Ответ сервера на сообщение: "+tmp;
 
     reply->deleteLater();
     //emit WebSSOLogin::ReturnToken(Resp->size->toString);
@@ -142,19 +144,38 @@ void WebSSOLogin::GetResponse(QNetworkReply *reply)
 //Слот для приема номера ошибки при отправке POST сообщения
 void WebSSOLogin::slotError(QNetworkReply::NetworkError tcode)
 {
+    /*
     QMessageBox::information(
         this,
         trUtf8( "Ошибка сервера" ),
-        QString("Number POST error: ")+QString::number(tcode) ,
+        QString("Number POST error: ")+QString::number(tcode),
         QMessageBox::Ok
     );
+*/
+    qWarning(logWarning) << "Ошибка отправки POST сообщения №: " << QString::number(tcode);
+
 }
 
 void WebSSOLogin::slotSSLError(QList<QSslError> ListError)
 {
-    //TODO
+    QMessageBox::information(
+        this,
+        trUtf8( "Ошибка сервера" ),
+        trUtf8( "Ошибка сервера" ),
+        QMessageBox::Ok
+    );
+
     foreach( const QSslError &ListError, ListError )
     {
-        ListError.errorString();
+        qDebug(logDebug) << "Ошибка SSL: " << ListError.errorString();
+    }
+}
+
+void WebSSOLogin::slotSSLError2(QNetworkReply * rep, QList<QSslError> listerr)
+{
+    qWarning(logWarning) << "SSL ошибка отправки POST сообщения №: " << QString::number(rep->error());
+    foreach( const QSslError &listerr, listerr )
+    {
+        qDebug(logDebug) << "Ошибка SSL: " << listerr.errorString();
     }
 }

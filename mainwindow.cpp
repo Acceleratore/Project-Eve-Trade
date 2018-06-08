@@ -15,26 +15,31 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Проверка на наличия драйвера SQLITE
     if (!QSqlDatabase::drivers().contains("QSQLITE"))
+    {
         QMessageBox::critical(this, "Unable to load database", "Для работы необходим SQLITE драйвер");
-
+        qCritical(logCritical()) << "Не найден драйвер для работы базы данных. Для работы необходим SQLITE драйвер!";
+    }
     QUserDBWork CharactersDB("QSQLITE");
 
-    QString PathToDB = "";
+    QString PathToDir = "";
 
     //Для упрощения отладки, перед релизом можно убрать
     if (DEBUG_MODE)
     {
-        PathToDB = PRO_FILE_PWD;
+        PathToDir = PRO_FILE_PWD;
     } else
     {
-        PathToDB = QCoreApplication::applicationDirPath();
+        PathToDir = QCoreApplication::applicationDirPath();
     }
 
+    qDebug(logDebug()) << "Директория до папки с проектом установлена в: "+PathToDir;
+
     //Инициализация ДБ
-    QSqlError err = CharactersDB.InitDB(PathToDB+"/ProjectEVET.sqlite");
+    QSqlError err = CharactersDB.InitDB(PathToDir+"/ProjectEVET.sqlite");
     if (err.type() != QSqlError::NoError)
     {
         QMessageBox::critical(this, "Неудачная попытка инициализации базы данных", "Не удалось инициализаровать базу данных, ошибка №: " + err.text());
+        qCritical(logCritical()) << "Не удалось инициализаровать базу данных, ошибка №: " + err.text();
         return;
     }
 
@@ -82,8 +87,10 @@ QSqlError QUserDBWork::InitDB(QString _NameDB)
     this->db.setDatabaseName(_NameDB);
 
     if (!this->db.open())
+    {
         return this->db.lastError();
-
+        qCritical(logCritical()) << "Ошибка открытия базы данных: "+_NameDB;
+    }
     return QSqlError();
 }
 
