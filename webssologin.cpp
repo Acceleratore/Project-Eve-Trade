@@ -27,6 +27,7 @@ WebSSOLogin::~WebSSOLogin()
     delete Net_Manager;
 }
 
+//Слот через который корректно открывается окно с веб компонентом
 void WebSSOLogin::ShowLogin()
 {
     QUrl AddressLogin;
@@ -56,8 +57,6 @@ void WebSSOLogin::ShowLogin()
     } else
         QMessageBox::critical(this, "Ошибочный URL", "URL не валиден: " + AddressLogin.toString());
 
-
-    //delete AddressLogin;
     this->exec();
 
 }
@@ -67,6 +66,7 @@ void WebSSOLogin::ShowLogin()
 //В случае совпадения, он забирает с него переданный код
 void WebSSOLogin::WaitUrl(const QUrl &url)
 {
+
     QUrl RedUrl = QUrl(RedirectURL, QUrl::TolerantMode);
 
     //Если это необходимая страница и код статуса совпадает с переданым, извлекаем токен авторизации и посылаем POST запрос на получения токена доступа
@@ -76,47 +76,48 @@ void WebSSOLogin::WaitUrl(const QUrl &url)
         //Забрали из URL проверочный токен
         QString AccessToken = QUrlQuery(url.query()).queryItemValue("code").trimmed();
 
+        qDebug(logDebug) << "Получен код доступа " << AccessToken;
+
         //Собираем POST запрос на получение токена для получения данных
         //Код авторизации
         QString AuthStr = QString(ClientID+":"+SecretKey).trimmed();
+        qDebug(logDebug()) << "Собран код авторизации: " << AuthStr;
 
-        //Передаем данные загаловка
+        //Настрока SSL конфигурации для POST
+        QSslConfiguration sslConfig = QSslConfiguration::defaultConfiguration();
+        sslConfig.setProtocol(QSsl::AnyProtocol);
+        sslConfig.setPeerVerifyMode(QSslSocket::VerifyNone);
 
         QNetworkRequest Request;
-        Request.setUrl(QUrl( SSOAddress+"/token" ));
-        Request.setRawHeader("Authorization", QString("Basic "+AuthStr.toLatin1().toBase64()).toUtf8());
-        Request.setHeader( QNetworkRequest::ContentTypeHeader, "application/json" );
-
-        QSslConfiguration sslConfig = QSslConfiguration::defaultConfiguration();
-        //QList<QSslCertificate> ca_new = QSslCertificate::fromData("CaCertificates");
-        sslConfig.setProtocol(QSsl::SslV3);
-        //sslConfig.setCaCertificates(ca_new);
         Request.setSslConfiguration(sslConfig);
 
+        qDebug(logDebug) << "Установлен протокол SSL тунеля: " << QString::number(Request.sslConfiguration().protocol());
+
+        //Установили данные загаловка
+        Request.setUrl(QUrl( SSOAddress+"/token" ));
+        Request.setRawHeader("Authorization", QString("Basic "+AuthStr.toLatin1().toBase64()).toUtf8());
+        Request.setHeader( QNetworkRequest::ContentTypeHeader, /*"application/json"*/ "application/x-www-form-urlencoded" );
+
+        qDebug(logDebug()) << "Адрес ESI сервера: " << QUrl( SSOAddress+"/token" ).toString();
+        qDebug(logDebug()) << "Строка авторизации в BASE64: " << QString("Basic "+AuthStr.toLatin1().toBase64()).toUtf8();
+        qDebug(logDebug()) << "ContentTypeHeader:" << Request.header(QNetworkRequest::KnownHeaders::ContentTypeHeader).toString();
+        qDebug(logDebug()) << "UserAgentHeader:" << Request.header(QNetworkRequest::KnownHeaders::UserAgentHeader).toString();
+        qDebug(logDebug()) << " " << Request.rawHeader("Authorization");
+
         //Данные запроса
-        QJsonObject QueryJsonPOST;
-        QueryJsonPOST.insert("grant_type", QJsonValue::fromVariant("authorization_code"));
-        QueryJsonPOST.insert("code", QJsonValue::fromVariant(AccessToken));
-        QJsonDocument JsonDoc(QueryJsonPOST);
+        QUrlQuery ParmReq;
+
+        ParmReq.addQueryItem("grant_type", "authorization_code");
+        ParmReq.addQueryItem("code", AccessToken);
 
         QNetworkReply *reply = nullptr;
         //Отправка запроса
-        reply = Net_Manager->post(Request, JsonDoc.toBinaryData());
-
-
-        //ТЕСТ
-/*
-        QNetworkRequest TestReq;
-        TestReq.setUrl(QUrl("http://httpbin.org/post"));
-        TestReq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-        TestReq.setRawHeader("Authorization", "Basic "+AuthStr.toLatin1().toBase64());
-        QNetworkReply * reply = Net_Manager->post(TestReq, QString("123").toUtf8());
-*/
-        //ТЕСТ
+        reply = Net_Manager->post(Request, /*QueryPOST.query().toUtf8()*/ ParmReq.toString().toUtf8());
 
         //Соединение сигнала ошибок с слотом обработки ошибки при отправке
         connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(slotError(QNetworkReply::NetworkError)));
         connect(reply, SIGNAL(sslErrors(QList<QSslError>)),        this, SLOT(slotSSLError(QList<QSslError>)));
+        qDebug(logDebug) << Request.attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
 
         LoginWebView->close();
     }
@@ -144,16 +145,14 @@ void WebSSOLogin::GetResponse(QNetworkReply *reply)
 //Слот для приема номера ошибки при отправке POST сообщения
 void WebSSOLogin::slotError(QNetworkReply::NetworkError tcode)
 {
-    /*
     QMessageBox::information(
         this,
         trUtf8( "Ошибка сервера" ),
         QString("Number POST error: ")+QString::number(tcode),
         QMessageBox::Ok
     );
-*/
-    qWarning(logWarning) << "Ошибка отправки POST сообщения №: " << QString::number(tcode);
 
+    qWarning(logWarning) << "Ошибка отправки POST сообщения №: " << QString::number(tcode);
 }
 
 void WebSSOLogin::slotSSLError(QList<QSslError> ListError)

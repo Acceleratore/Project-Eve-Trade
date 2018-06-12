@@ -15,6 +15,7 @@
 #include <QList>
 #include <QSslError>
 #include "logger.h"
+#include <QSslCertificate>
 
 namespace Ui {
 class WebSSOLogin;

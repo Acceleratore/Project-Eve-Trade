@@ -60,6 +60,7 @@ void MainWindow::InitialLoginWindow()
 
 MainWindow::~MainWindow()
 {
+    qDebug(logInfo()) << "";
     delete ui;
     delete wWSSOL;
 }

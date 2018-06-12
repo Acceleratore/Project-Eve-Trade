@@ -27,14 +27,16 @@ SOURCES += \
         mainwindow.cpp \
     managecharacters.cpp \
     webssologin.cpp \
-    logger.cpp
+    logger.cpp \
+    esi_manager.cpp
 
 HEADERS += \
         mainwindow.h \
     managecharacters.h \
     workdb.h \
     webssologin.h \
-    logger.h
+    logger.h \
+    esi_manager.h
 
 FORMS += \
         mainwindow.ui \
