@@ -2,20 +2,10 @@
 #define WEBSSOLOGIN_H
 
 #include <QDialog>
-#include "QWebEngineView"
-#include "QMessageBox"
+#include <QWebEngineView>
+#include <QMessageBox>
 #include <QUrlQuery>
-#include "QNetworkReply"
-#include "QNetworkAccessManager"
-#include "QByteArray"
-#include "QNetworkRequest"
-#include "QJsonObject"
-#include "QJsonDocument"
-#include <QSslConfiguration>
-#include <QList>
-#include <QSslError>
 #include "logger.h"
-#include <QSslCertificate>
 
 namespace Ui {
 class WebSSOLogin;
@@ -40,13 +30,8 @@ signals:
 private:
     Ui::WebSSOLogin *ui;
 
-    static const QString SSOAddress;
-    static const QString ReponseType;
-    static const QString RedirectURL;
-    static const QString ClientID;
-    static const QString SecretKey;
+
     QWebEngineView *LoginWebView = 0;
-    QNetworkAccessManager* Net_Manager = 0;
 };
 
 #endif // WEBSSOLOGIN_H

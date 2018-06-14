@@ -14,17 +14,19 @@ WebSSOLogin::WebSSOLogin(QWidget *parent) :
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
     this->setWindowTitle("Вход по SSO");
+    /*
     Net_Manager = new QNetworkAccessManager( this );
 
     connect(Net_Manager, SIGNAL(finished(QNetworkReply*)) , this, SLOT(GetResponse(QNetworkReply*)));
     connect(Net_Manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(slotSSLError2(QNetworkReply*,QList<QSslError>)));
+    */
 }
 
 WebSSOLogin::~WebSSOLogin()
 {
     delete ui;
     delete LoginWebView;
-    delete Net_Manager;
+    //delete Net_Manager;
 }
 
 //Слот через который корректно открывается окно с веб компонентом
