@@ -19,6 +19,7 @@ class ESI_manager
         QNetworkAccessManager* Net_Manager = 0;
         QSslConfiguration sslConfig;
         QNetworkRequest Request;
+        QUrlQuery ParmReq;
 
         static const QString SSOAddress;
         static const QString ReponseType;
@@ -28,10 +29,23 @@ class ESI_manager
 
     public:
 
+        //Значения типов контента
         enum TypeHead {
-            TypeJson,
-            TypeURLENCODED
+            TypeJson,       //JSON данные
+            TypeURLENCODED  //Стандартные
         };
+
+        //Тип доступа
+        enum GrantType{
+            Authorize,    //Авторизация
+            RefreshToken  //Обновление токена доступа
+        };
+
+        //Тип второго параметра
+        enum TypeParm{
+            Code,   //Код
+            Refresh //Обновление токена
+        }
 
         ESI_manager();
         ~ESI_manager();

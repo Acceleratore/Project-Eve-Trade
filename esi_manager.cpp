@@ -29,7 +29,7 @@ void ESI_manager::Set_sslConfig(QSsl::SslProtocol protocol)
     qDebug(logInfo) << "Установлен протокол SSL тунеля: " << QString::number(this->Request.sslConfiguration().protocol());
 }
 
-static QString ContentType(ESI_manager::TypeHead Type)
+static QString ValueContentType(ESI_manager::TypeHead Type)
 {
     switch (Type){
     case ESI_manager::TypeURLENCODED:
@@ -39,13 +39,33 @@ static QString ContentType(ESI_manager::TypeHead Type)
     }
 }
 
+static QString ValueGrantType(ESI_manager::GrantType Type)
+{
+    switch(type){
+    case ESI_manager::Authorize:
+        return QString("authorization_code");
+    case ESI_manager::RefreshToken:
+        return QString("refresh_token");
+    }
+}
+
+static QString ValueTypeParm(ESI_manager::TypeParm Type)
+{
+    switch(type){
+    case ESI_manager::Code:
+        return QString("code");
+    case ESI_manager::Refresh:
+        return QString("refresh_token");
+    }
+}
+
 //Установка параметров для запроса
 void ESI_manager::Set_Request(ESI_manager::TypeHead Type)
 {
 
     //Код авторизации
     QString AuthStr = QString(ClientID+":"+SecretKey).trimmed();
-    QString tConType = ContentType(Type);
+    QString tConType = ValueContentType(Type);
 
     //Установили данные загаловка
     Request.setUrl(QUrl( SSOAddress+"/token" ));
@@ -62,7 +82,17 @@ void ESI_manager::Set_Request(ESI_manager::TypeHead Type)
 
 }
 
-void Set_Query()
+//Заполнение тела запроса
+//Type - значение параметра grant_type
+//Parm1 и Value1 второй параметр запроса, тип запроса заполняется из списка, значение произвольное (обычно передается от SSO)
+void ESI_manager::Set_Query(ESI_manager::GrantType Type, ESI_manager::TypeParm Parm1, QString Value1)
+{
+    ParmReq.addQueryItem("grant_type", ValueGrantType(Type));
+    ParmReq.addQueryItem(ValueTypeParm(Parm1), Value1);
+}
+
+
+void SendPost()
 {
 
 }

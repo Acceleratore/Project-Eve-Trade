@@ -78,40 +78,6 @@ void WebSSOLogin::WaitUrl(const QUrl &url)
         //Забрали из URL проверочный токен
         QString AccessToken = QUrlQuery(url.query()).queryItemValue("code").trimmed();
 
-        qDebug(logDebug) << "Получен код доступа " << AccessToken;
-
-        //Собираем POST запрос на получение токена для получения данных
-        //Код авторизации
-        QString AuthStr = QString(ClientID+":"+SecretKey).trimmed();
-        qDebug(logDebug()) << "Собран код авторизации: " << AuthStr;
-
-        //Настрока SSL конфигурации для POST
-        QSslConfiguration sslConfig = QSslConfiguration::defaultConfiguration();
-        sslConfig.setProtocol(QSsl::AnyProtocol);
-        sslConfig.setPeerVerifyMode(QSslSocket::VerifyNone);
-
-        QNetworkRequest Request;
-        Request.setSslConfiguration(sslConfig);
-
-        qDebug(logDebug) << "Установлен протокол SSL тунеля: " << QString::number(Request.sslConfiguration().protocol());
-
-        //Установили данные загаловка
-        Request.setUrl(QUrl( SSOAddress+"/token" ));
-        Request.setRawHeader("Authorization", QString("Basic "+AuthStr.toLatin1().toBase64()).toUtf8());
-        Request.setHeader( QNetworkRequest::ContentTypeHeader, /*"application/json"*/ "application/x-www-form-urlencoded" );
-
-        qDebug(logDebug()) << "Адрес ESI сервера: " << QUrl( SSOAddress+"/token" ).toString();
-        qDebug(logDebug()) << "Строка авторизации в BASE64: " << QString("Basic "+AuthStr.toLatin1().toBase64()).toUtf8();
-        qDebug(logDebug()) << "ContentTypeHeader:" << Request.header(QNetworkRequest::KnownHeaders::ContentTypeHeader).toString();
-        qDebug(logDebug()) << "UserAgentHeader:" << Request.header(QNetworkRequest::KnownHeaders::UserAgentHeader).toString();
-        qDebug(logDebug()) << " " << Request.rawHeader("Authorization");
-
-        //Данные запроса
-        QUrlQuery ParmReq;
-
-        ParmReq.addQueryItem("grant_type", "authorization_code");
-        ParmReq.addQueryItem("code", AccessToken);
-
         QNetworkReply *reply = nullptr;
         //Отправка запроса
         reply = Net_Manager->post(Request, /*QueryPOST.query().toUtf8()*/ ParmReq.toString().toUtf8());
