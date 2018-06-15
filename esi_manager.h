@@ -15,46 +15,55 @@
 
 class ESI_manager
 {
-    private:
-        QNetworkAccessManager* Net_Manager = 0;
-        QSslConfiguration sslConfig;
-        QNetworkRequest Request;
-        QUrlQuery ParmReq;
 
-        static const QString SSOAddress;
-        static const QString ReponseType;
-        static const QString RedirectURL;
-        static const QString ClientID;
-        static const QString SecretKey;
+private:
+    QNetworkAccessManager* Net_Manager = nullptr;
+    QNetworkReply *reply = nullptr;
+    QSslConfiguration sslConfig;
+    QNetworkRequest Request;
+    QUrlQuery ParmReq;
 
-    public:
+public:
 
-        //Значения типов контента
-        enum TypeHead {
-            TypeJson,       //JSON данные
-            TypeURLENCODED  //Стандартные
-        };
+    static const QString SSOAddress;
+    static const QString ReponseType;
+    static const QString RedirectURL;
+    static const QString ClientID;
+    static const QString SecretKey;
 
-        //Тип доступа
-        enum GrantType{
-            Authorize,    //Авторизация
-            RefreshToken  //Обновление токена доступа
-        };
+    //Значения типов контента
+    enum TypeHead {
+        TypeJson,       //JSON данные
+        TypeURLENCODED  //Стандартные
+    };
 
-        //Тип второго параметра
-        enum TypeParm{
-            Code,   //Код
-            Refresh //Обновление токена
-        }
+    //Тип доступа
+    enum GrantType {
+        Authorize,     //Авторизация
+        Refresh Token  //Обновление токена доступа
+    };
 
-        ESI_manager();
-        ~ESI_manager();
+    //Тип второго параметра
+    enum TypeParm{
+        Code,   //Код
+        Refresh //Обновление токена
+    }
 
-        void Set_sslConfig();
-        void Set_Request();
-        void Set_Query();
-        void Set_QueryJson();
-        void SendPost();
+    ESI_manager();
+    ~ESI_manager();
+
+    void Set_sslConfig(QSsl::SslProtocol protocol);
+    void Set_Request(ESI_manager::TypeHead Type);
+    void Set_Query(ESI_manager::GrantType Type, ESI_manager::TypeParm Parm1, QString Value1);
+    void Set_QueryJson();
+    void SendPost();
+
+
+public slots:
+    void slotError(QNetworkReply::NetworkError tcode);
+    void slotSSLError(QList<QSslError> ListError);
+    void slotSSLError2(QNetworkReply*, QList<QSslError>);
+    void GetResponse(QNetworkReply *reply);
 };
 
 #endif // ESI_MANAGER_H

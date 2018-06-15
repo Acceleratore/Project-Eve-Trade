@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QUrlQuery>
 #include "logger.h"
+#include "esi_manager.h"
 
 namespace Ui {
 class WebSSOLogin;
@@ -22,16 +23,12 @@ public slots:
     void ShowLogin();
     void WaitUrl(const QUrl &url);
     void GetResponse(QNetworkReply *reply);
-    void slotError(QNetworkReply::NetworkError tcode);
-    void slotSSLError(QList<QSslError> ListError);
-    void slotSSLError2(QNetworkReply*, QList<QSslError>);
 signals:
     void ReturnToken(QString str);
 private:
     Ui::WebSSOLogin *ui;
-
-
-    QWebEngineView *LoginWebView = 0;
+    ESI_manager *ManagerESI = nullptr;
+    QWebEngineView *LoginWebView = nullptr;
 };
 
 #endif // WEBSSOLOGIN_H

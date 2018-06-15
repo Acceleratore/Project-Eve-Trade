@@ -1,12 +1,18 @@
 #include "esi_manager.h"
 
+const QString ESI_manager::SSOAddress  = QString("https://login.eveonline.com/oauth");
+const QString ESI_manager::ReponseType = QString("code");
+const QString ESI_manager::RedirectURL = QString("http://localhost:755/");
+const QString ESI_manager::ClientID    = QString("703adcbe76c94fd59679ae32a04d8329");
+const QString ESI_manager::SecretKey   = QString("EdMrlKYJnMgq8eZIAxlHUWJDol3ikywjX25T6xCY");
+
 //Конструктор
 ESI_manager::ESI_manager()
 {
     Net_Manager = new QNetworkAccessManager( this );
 
     connect(Net_Manager, SIGNAL(finished(QNetworkReply*)) , this, SLOT(GetResponse(QNetworkReply*)));
-    connect(Net_Manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(slotSSLError2(QNetworkReply*,QList<QSslError>)));
+    connect(Net_Manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(slotSSLErrorManeger(QNetworkReply*,QList<QSslError>)));
 }
 
 //Деструктор (КЭП на страже)
@@ -29,6 +35,7 @@ void ESI_manager::Set_sslConfig(QSsl::SslProtocol protocol)
     qDebug(logInfo) << "Установлен протокол SSL тунеля: " << QString::number(this->Request.sslConfiguration().protocol());
 }
 
+//Возвращает тип контента по виду в перечисляемом массиве
 static QString ValueContentType(ESI_manager::TypeHead Type)
 {
     switch (Type){
@@ -39,6 +46,7 @@ static QString ValueContentType(ESI_manager::TypeHead Type)
     }
 }
 
+//Возвращает тип авторизации по виду в перечисляемом массиве
 static QString ValueGrantType(ESI_manager::GrantType Type)
 {
     switch(type){
@@ -49,6 +57,7 @@ static QString ValueGrantType(ESI_manager::GrantType Type)
     }
 }
 
+//Возвращает параметр
 static QString ValueTypeParm(ESI_manager::TypeParm Type)
 {
     switch(type){
@@ -91,8 +100,59 @@ void ESI_manager::Set_Query(ESI_manager::GrantType Type, ESI_manager::TypeParm P
     ParmReq.addQueryItem(ValueTypeParm(Parm1), Value1);
 }
 
-
-void SendPost()
+//Отправка POST запроса
+void ESI_manager::SendPost()
 {
 
+    this->reply = this->Net_Manager->post(this->Request, this->ParmReq.toString().toUtf8());
+
+    //Соединение сигнала ошибок с слотом обработки ошибки при отправке
+    connect(this->reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(slotError(QNetworkReply::NetworkError)));
+    connect(this->reply, SIGNAL(sslErrors(QList<QSslError>)),        this, SLOT(slotSSLError(QList<QSslError>)));
+
+    qDebug(logDebug) << "Вернувшийся код запроса2: " << this->Request.attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
+}
+
+
+//Слот для приема номера ошибки при отправке POST сообщения
+void ESI_manager::slotError(QNetworkReply::NetworkError tcode)
+{
+    QMessageBox::information(
+        this,
+        QString( "Ошибка сервера" ).toUtf8(),
+        QString( "Код ошибки: " )+QString::number(tcode),
+        QMessageBox::Ok
+    );
+
+    qWarning(logWarning) << "Ошибка отправки POST сообщения №: " << QString::number(tcode);
+}
+
+//Слот для приема SSL ошибки от возвращаемых данных запроса
+void ESI_manager::slotSSLError(QList<QSslError> ListError)
+{
+    foreach( const QSslError &ListError, ListError )
+    {
+        qDebug(logWarning) << "Ошибка SSL в возвращаемых данных: " << ListError.errorString();
+    }
+}
+
+//Слот для приема SSL ошибки от менеджера
+void ESI_manager::slotSSLErrorManeger(QNetworkReply * rep, QList<QSslError> listerr)
+{
+    qWarning(logWarning) << "SSL ошибка отправки POST сообщения №: " << QString::number(rep->error());
+    foreach( const QSslError &listerr, listerr )
+    {
+        qDebug(logDebug) << "Ошибка SSL в менеджере отправки: " << listerr.errorString();
+    }
+}
+
+void ESI_manager::GetResponse(QNetworkReply *reply)
+{
+    QByteArray *DataPOSTToken = new QByteArray(reply->readAll());
+    QString tmp = DataPOSTToken->data();
+
+    qDebug(logDebug) << "Ответ сервера на сообщение: "+tmp;
+
+    this->reply->deleteLater();
+    //emit WebSSOLogin::ReturnToken(Resp->size->toString);
 }
