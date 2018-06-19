@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     LoggerFile.reset(new QFile(QString("logs/LogFile.log")));
 
     //Определяем режим открытия
-    LoggerFile.data()->open(QFile::Append | QFile::Text);
+    LoggerFile.data()->open(QFile::Truncate | QFile::Text | QFile::ReadWrite);
 
     //Переопределяем функцию для вывода информации
     qInstallMessageHandler(messageHandler);

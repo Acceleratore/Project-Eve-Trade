@@ -1,6 +1,7 @@
 #ifndef ESI_MANAGER_H
 #define ESI_MANAGER_H
 
+#include <QObject>
 #include <QSslCertificate>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
@@ -11,14 +12,14 @@
 #include <QSslConfiguration>
 #include <QList>
 #include <QSslError>
+#include <QUrlQuery>
 #include "logger.h"
 
-class ESI_manager
+class ESI_manager : public QObject
 {
-
+    Q_OBJECT
 private:
     QNetworkAccessManager* Net_Manager = nullptr;
-    QNetworkReply *reply = nullptr;
     QSslConfiguration sslConfig;
     QNetworkRequest Request;
     QUrlQuery ParmReq;
@@ -40,16 +41,17 @@ public:
     //Тип доступа
     enum GrantType {
         Authorize,     //Авторизация
-        Refresh Token  //Обновление токена доступа
+        RefreshToken  //Обновление токена доступа
     };
 
     //Тип второго параметра
     enum TypeParm{
         Code,   //Код
         Refresh //Обновление токена
-    }
+    };
 
-    ESI_manager();
+    //ESI_manager();
+    explicit ESI_manager(QObject *parent = nullptr);
     ~ESI_manager();
 
     void Set_sslConfig(QSsl::SslProtocol protocol);
@@ -62,8 +64,10 @@ public:
 public slots:
     void slotError(QNetworkReply::NetworkError tcode);
     void slotSSLError(QList<QSslError> ListError);
-    void slotSSLError2(QNetworkReply*, QList<QSslError>);
+    void slotSSLErrorManeger(QNetworkReply*, QList<QSslError>);
     void GetResponse(QNetworkReply *reply);
+signals:
+    void ReturnData(QString tStr);
 };
 
 #endif // ESI_MANAGER_H

@@ -31,8 +31,8 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         PathToDir = QCoreApplication::applicationDirPath();
     }
-
     qDebug(logDebug()) << "Директория до папки с проектом установлена в: "+PathToDir;
+
 
     //Инициализация ДБ
     QSqlError err = CharactersDB.InitDB(PathToDir+"/ProjectEVET.sqlite");
@@ -55,7 +55,7 @@ void MainWindow::InitialLoginWindow()
 {
     wWSSOL = new WebSSOLogin(this);
     connect(ui->LoginSSOButton, SIGNAL(clicked()), wWSSOL, SLOT(ShowLogin()), Qt::UniqueConnection);
-    connect( wWSSOL, SIGNAL(ReturnToken(QString)), this, SLOT(GetToken(QString)) );
+    connect( wWSSOL, SIGNAL(ReturnData(QString)), this, SLOT(GetToken(QString)) );
 }
 
 MainWindow::~MainWindow()

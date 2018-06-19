@@ -65,12 +65,12 @@ void WebSSOLogin::WaitUrl(const QUrl &url)
 
         //Забрали из URL проверочный токен
         QString AccessToken = QUrlQuery(url.query()).queryItemValue("code").trimmed();
-        ManagerESI = new ESI_manager;
+        ManagerESI = new ESI_manager();
 
         //Соединение сигнала менеджера со слотом окна для получения данных назад
         //В данном случае возвращается временный токен для получения доступа к API и токен обновления,
         //для получения нового временного токена после истечения предыдущего
-        //connect(ManagerESI, SIGNAL(ReturnToken(QString), this, SLOT(GetTokensPOST));
+        connect(ManagerESI, SIGNAL(ReturnData(QString)), this, SLOT(GetDataPOSTResp(QString)), Qt::AutoConnection);
 
         ManagerESI->Set_sslConfig(QSsl::AnyProtocol);
         ManagerESI->Set_Request(ESI_manager::TypeURLENCODED);
@@ -82,4 +82,10 @@ void WebSSOLogin::WaitUrl(const QUrl &url)
 
 }
 
-
+//Слот принимает данные из POST запроса (в данном случае временный токен, время жизни токена, токен обновления)
+//и передает его в основное окно
+void WebSSOLogin::GetDataPOSTResp(QString tStr)
+{
+    emit WebSSOLogin::ReturnData(tStr);
+    this->close();
+}

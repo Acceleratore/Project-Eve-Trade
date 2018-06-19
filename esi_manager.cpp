@@ -7,12 +7,12 @@ const QString ESI_manager::ClientID    = QString("703adcbe76c94fd59679ae32a04d83
 const QString ESI_manager::SecretKey   = QString("EdMrlKYJnMgq8eZIAxlHUWJDol3ikywjX25T6xCY");
 
 //Конструктор
-ESI_manager::ESI_manager()
+ESI_manager::ESI_manager(QObject *parent) : QObject(parent)
 {
-    Net_Manager = new QNetworkAccessManager( this );
+    Net_Manager = new QNetworkAccessManager();
 
-    connect(Net_Manager, SIGNAL(finished(QNetworkReply*)) , this, SLOT(GetResponse(QNetworkReply*)));
-    connect(Net_Manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(slotSSLErrorManeger(QNetworkReply*,QList<QSslError>)));
+    QObject::connect(this->Net_Manager, SIGNAL(finished(QNetworkReply*)),                   this, SLOT(GetResponse(QNetworkReply*)),                           Qt::UniqueConnection);
+    QObject::connect(this->Net_Manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(slotSSLErrorManeger(QNetworkReply*, QList<QSslError>)), Qt::UniqueConnection);
 }
 
 //Деструктор (КЭП на страже)
@@ -43,28 +43,34 @@ static QString ValueContentType(ESI_manager::TypeHead Type)
         return QString("application/x-www-form-urlencoded");
     case ESI_manager::TypeJson:
         return QString("application/json");
+    default:
+        return QString("application/x-www-form-urlencoded");
     }
 }
 
 //Возвращает тип авторизации по виду в перечисляемом массиве
 static QString ValueGrantType(ESI_manager::GrantType Type)
 {
-    switch(type){
+    switch(Type){
     case ESI_manager::Authorize:
         return QString("authorization_code");
     case ESI_manager::RefreshToken:
         return QString("refresh_token");
+    default:
+        return QString("");
     }
 }
 
 //Возвращает параметр
 static QString ValueTypeParm(ESI_manager::TypeParm Type)
 {
-    switch(type){
+    switch(Type){
     case ESI_manager::Code:
         return QString("code");
     case ESI_manager::Refresh:
         return QString("refresh_token");
+    default:
+        return QString("");
     }
 }
 
@@ -104,11 +110,11 @@ void ESI_manager::Set_Query(ESI_manager::GrantType Type, ESI_manager::TypeParm P
 void ESI_manager::SendPost()
 {
 
-    this->reply = this->Net_Manager->post(this->Request, this->ParmReq.toString().toUtf8());
+    QNetworkReply *reply = this->Net_Manager->post(this->Request, this->ParmReq.toString().toUtf8());
 
     //Соединение сигнала ошибок с слотом обработки ошибки при отправке
-    connect(this->reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(slotError(QNetworkReply::NetworkError)));
-    connect(this->reply, SIGNAL(sslErrors(QList<QSslError>)),        this, SLOT(slotSSLError(QList<QSslError>)));
+    QObject::connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(slotError(QNetworkReply::NetworkError)), Qt::UniqueConnection);
+    QObject::connect(reply, SIGNAL(sslErrors(QList<QSslError>)),        this, SLOT(slotSSLError(QList<QSslError>)),         Qt::UniqueConnection);
 
     qDebug(logDebug) << "Вернувшийся код запроса2: " << this->Request.attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
 }
@@ -117,13 +123,6 @@ void ESI_manager::SendPost()
 //Слот для приема номера ошибки при отправке POST сообщения
 void ESI_manager::slotError(QNetworkReply::NetworkError tcode)
 {
-    QMessageBox::information(
-        this,
-        QString( "Ошибка сервера" ).toUtf8(),
-        QString( "Код ошибки: " )+QString::number(tcode),
-        QMessageBox::Ok
-    );
-
     qWarning(logWarning) << "Ошибка отправки POST сообщения №: " << QString::number(tcode);
 }
 
@@ -144,6 +143,8 @@ void ESI_manager::slotSSLErrorManeger(QNetworkReply * rep, QList<QSslError> list
     {
         qDebug(logDebug) << "Ошибка SSL в менеджере отправки: " << listerr.errorString();
     }
+
+    rep->deleteLater();
 }
 
 void ESI_manager::GetResponse(QNetworkReply *reply)
@@ -153,6 +154,6 @@ void ESI_manager::GetResponse(QNetworkReply *reply)
 
     qDebug(logDebug) << "Ответ сервера на сообщение: "+tmp;
 
-    this->reply->deleteLater();
-    //emit WebSSOLogin::ReturnToken(Resp->size->toString);
+    reply->deleteLater();
+    emit ESI_manager::ReturnData(tmp);
 }

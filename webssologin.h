@@ -4,7 +4,6 @@
 #include <QDialog>
 #include <QWebEngineView>
 #include <QMessageBox>
-#include <QUrlQuery>
 #include "logger.h"
 #include "esi_manager.h"
 
@@ -22,9 +21,9 @@ public:
 public slots:
     void ShowLogin();
     void WaitUrl(const QUrl &url);
-    void GetResponse(QNetworkReply *reply);
+    void GetDataPOSTResp(QString tStr);
 signals:
-    void ReturnToken(QString str);
+    void ReturnData(QString tStr);
 private:
     Ui::WebSSOLogin *ui;
     ESI_manager *ManagerESI = nullptr;
