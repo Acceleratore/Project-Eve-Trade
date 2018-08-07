@@ -21,9 +21,9 @@ public:
 public slots:
     void ShowLogin();
     void WaitUrl(const QUrl &url);
-    void GetDataPOSTResp(QString tStr);
+    void GetDataPOSTResp(QByteArray tBArr);
 signals:
-    void ReturnData(QString tStr);
+    void ReturnData(QByteArray tBArr);
 private:
     Ui::WebSSOLogin *ui;
     ESI_manager *ManagerESI = nullptr;

@@ -7,21 +7,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    QString PathToDir = QCoreApplication::applicationDirPath();
+
+    /* БЛОК ДЛЯ ОТЛАДКИ */
     bool DEBUG_MODE = false;
 
     #ifndef QT_NO_DEBUG
         DEBUG_MODE = true;
     #endif
-
-    //Проверка на наличия драйвера SQLITE
-    if (!QSqlDatabase::drivers().contains("QSQLITE"))
-    {
-        QMessageBox::critical(this, "Unable to load database", "Для работы необходим SQLITE драйвер");
-        qCritical(logCritical()) << "Не найден драйвер для работы базы данных. Для работы необходим SQLITE драйвер!";
-    }
-    QUserDBWork CharactersDB("QSQLITE");
-
-    QString PathToDir = "";
 
     //Для упрощения отладки, перед релизом можно убрать
     if (DEBUG_MODE)
@@ -31,11 +24,37 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         PathToDir = QCoreApplication::applicationDirPath();
     }
-    qDebug(logDebug()) << "Директория до папки с проектом установлена в: "+PathToDir;
 
+    qDebug(logDebug()) << "Директория до папки с проектом установлена в: "+PathToDir;
+    /* ОКОНЧАНИЯ БЛОКА ИНФОРМАЦИИ ОТЛАДКИ */
+
+
+    //Инициализация менеджера запросов
+    this->ManagerESI = ESI_manager(this);
+
+
+    /* Блок подключения сигналов и слотов */
+
+    connect( this, SIGNAL(NewToken()),                   this,       SLOT(GetClientIDByToken()),     Qt::AutoConnection );
+    connect( this, SIGNAL(UpdateCharacter(QUserDBWork)), &wMC,       SLOT(RefreshData(QUserDBWork)), Qt::AutoConnection );
+    connect( this, SLOT(GetCharactersData(QByteArray)),  ManagerESI, SIGNAL(ReturnData(QByteArray)), Qt::UniqueConnection);
+
+    connect( this, SIGNAL(TransfCharacterData(int,QString,QString)), &wMC, SLOT(AddCharacter(int,QString,QString)), Qt::UniqueConnection);
+
+    /* Окончание блока подключения сигналов и слотов */
+
+
+    //Проверка на наличия драйвера SQLITE
+    if (!QSqlDatabase::drivers().contains("QSQLITE"))
+    {
+        QMessageBox::critical(this, "Unable to load database", "Для работы необходим SQLITE драйвер");
+        qCritical(logCritical()) << "Не найден драйвер для работы базы данных. Для работы необходим SQLITE драйвер!";
+    }
+
+    QUserDBWork MainDB("QSQLITE");
 
     //Инициализация ДБ
-    QSqlError err = CharactersDB.InitDB(PathToDir+"/ProjectEVET.sqlite");
+    QSqlError err = MainDB.InitDB(PathToDir+"/ProjectEVET.sqlite");
     if (err.type() != QSqlError::NoError)
     {
         QMessageBox::critical(this, "Неудачная попытка инициализации базы данных", "Не удалось инициализаровать базу данных, ошибка №: " + err.text());
@@ -44,9 +63,9 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     //Заполнение таблицы персонажей
-    MainWindow::wMC.SetDataInCharTable(CharactersDB.GetListCharacters());
+    emit UpdateCharacter(MainDB);
 
-    InitialLoginWindow();
+    InitialLoginWindow();//Обрати внимание!!!???
 
 }
 
@@ -54,13 +73,13 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::InitialLoginWindow()
 {
     wWSSOL = new WebSSOLogin(this);
-    connect(ui->LoginSSOButton, SIGNAL(clicked()), wWSSOL, SLOT(ShowLogin()), Qt::UniqueConnection);
-    connect( wWSSOL, SIGNAL(ReturnData(QString)), this, SLOT(GetToken(QString)) );
+    connect( ui->LoginSSOButton, SIGNAL(clicked()),              wWSSOL, SLOT(ShowLogin()),             Qt::UniqueConnection );
+    connect( wWSSOL,             SIGNAL(ReturnData(QByteArray)), this,   SLOT(GetAuthData(QByteArray)), Qt::UniqueConnection );
 }
 
 MainWindow::~MainWindow()
 {
-    qDebug(logInfo()) << "";
+    qDebug(logInfo()) << "Закрытие программы";
     delete ui;
     delete wWSSOL;
 }
@@ -70,52 +89,62 @@ void MainWindow::on_actionManage_characters_triggered()
     MainWindow::wMC.show();
 }
 
-//Конструктор класса
-QUserDBWork::QUserDBWork(QString _NameDriver)
-{
-    this->db = QSqlDatabase::addDatabase(_NameDriver);
-}
-
-//Деструктор класса
-QUserDBWork::~QUserDBWork()
-{
-    this->db.close();
-}
-
-//Инициализация базы данных
-QSqlError QUserDBWork::InitDB(QString _NameDB)
-{
-    this->db.setDatabaseName(_NameDB);
-
-    if (!this->db.open())
-    {
-        return this->db.lastError();
-        qCritical(logCritical()) << "Ошибка открытия базы данных: "+_NameDB;
-    }
-    return QSqlError();
-}
-
-//Запрос списка персонажей в БД
-QSqlQuery QUserDBWork::GetListCharacters()
-{
-    QSqlQuery query(this->db);
-    query.exec("SELECT * FROM \"Characters\"");
-
-    return query;
-}
-
+//Слот для сигнала нажатия на кнопку входа
 void MainWindow::on_LoginSSOButton_clicked()
 {
     InitialLoginWindow();
 }
 
-void MainWindow::GetToken(QString str)
+//Слот для получения токенов при входе по SSO
+void MainWindow::GetAuthData(QByteArray tBArr)
 {
+    QJsonDocument JsonDoc = QJsonDocument::fromJson(tBArr);
 
-    QMessageBox::information(
-        this,
-        trUtf8( "Ответ сервера" ),
-        str,
-        QMessageBox::Ok
-    );
+    if(!JsonDoc.isNull())
+    {
+        QJsonObject jObj = JsonDoc.object();
+
+        this->TempToken   = QString(jObj.value("access_token").toString());
+        this->RefreshToken = QString(jObj.value("refresh_token").toString());
+        this->TypeToken   = QString(jObj.value("token_type").toString());
+
+        emit NewToken();
+
+        qDebug(logDebug()) << QString("Получены данные в формате Json: " + JsonDoc.toJson());
+        qDebug(logDebug()) << QString("Выделенно значения токена: " + this->TempToken);
+        qDebug(logDebug()) << QString("Выделенно значения токена обновления: " + this->RefreshToken);
+
+    } else
+        qDebug(logWarning()) << "Ошибка получения токена, ответ не содержит данные или данные не в формате Json. Размер ответа: " << QString::number(tBArr.size()) << " байт";
+
+}
+
+//Слот вызывается по сигналу о том, что был выдан новый токен обновления и его необходимо изменить
+void MainWindow::GetCharactersData(QByteArray tBArr)
+{
+    //TODO !!!!
+    QJsonDocument JsonDoc = QJsonDocument::fromJson(tBArr);
+
+    if(!JsonDoc.isNull())
+    {
+        QJsonObject jObj = JsonDoc.object();
+
+        int     CharacterID   = QString(jObj.value("CharacterID").toInt());
+        QString CharacterName = QString(jObj.value("CharacterName").toString());
+
+        emit TransfCharacterData(CharacterID, CharacterName, this->RefreshToken);
+
+        qDebug(logDebug()) << QString("Получены данные в формате Json: " + JsonDoc.toJson());
+
+    } else
+        qDebug(logWarning()) << "Ошибка получения токена, ответ не содержит данные или данные не в формате Json. Размер ответа: " << QString::number(tBArr.size()) << " байт";
+
+}
+
+//Получить ID персонажа по временному токену
+void MainWindow::GetClientIDByToken()
+{
+    ManagerESI->Set_sslConfig(QSsl::AnyProtocol);
+    ManagerESI->Set_Request(ESI_manager::VerifuAddress, this->TypeToken, this->TempToken);
+    ManagerESI->SendGet();
 }

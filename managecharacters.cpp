@@ -21,8 +21,8 @@ void ManageCharacters::on_pushButton_add_clicked()
     ui->tableWidget->insertRow(ui->tableWidget->rowCount());
 }
 
-//Заполнить таблицу данными
 
+//Заполнить таблицу данными
 void ManageCharacters::SetDataInCharTable(QSqlQuery _Query)
 {
     int IndChr = 0;
@@ -45,4 +45,21 @@ void ManageCharacters::SetDataInCharTable(QSqlQuery _Query)
             IndCol++;
         }
     }
+}
+
+void ManageCharacters::RefreshData(QUserDBWork tDB)
+{
+    this->ui->tableWidget->clear();
+    this->SetDataInCharTable(tDB.GetListCharacters());
+}
+
+void AddCharacter(int CharID, QString CharName, QString CharToken)
+{
+    QSqlDatabase db = QSqlDatabase::database( "MainDB" );
+
+    if (db.FindCharacterID(CharID))
+    {
+        db.UpdateCharacter();
+    } else
+        db.InsertCharacter();
 }

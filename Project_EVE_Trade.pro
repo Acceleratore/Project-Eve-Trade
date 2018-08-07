@@ -28,7 +28,8 @@ SOURCES += \
     managecharacters.cpp \
     webssologin.cpp \
     logger.cpp \
-    esi_manager.cpp
+    esi_manager.cpp \
+    workdb.cpp
 
 HEADERS += \
         mainwindow.h \

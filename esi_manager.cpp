@@ -1,15 +1,17 @@
 #include "esi_manager.h"
 
-const QString ESI_manager::SSOAddress  = QString("https://login.eveonline.com/oauth");
-const QString ESI_manager::ReponseType = QString("code");
-const QString ESI_manager::RedirectURL = QString("http://localhost:755/");
-const QString ESI_manager::ClientID    = QString("703adcbe76c94fd59679ae32a04d8329");
-const QString ESI_manager::SecretKey   = QString("EdMrlKYJnMgq8eZIAxlHUWJDol3ikywjX25T6xCY");
+const QString ESI_manager::ESIAddress    = QString("https://esi.evetech.net/latest/");
+const QString ESI_manager::VerifuAddress = QString("https://esi.tech.ccp.is/verify/");
+const QString ESI_manager::SSOAddress    = QString("https://login.eveonline.com/oauth");
+const QString ESI_manager::ReponseType   = QString("code");
+const QString ESI_manager::RedirectURL   = QString("http://localhost:755/");
+const QString ESI_manager::ClientID      = QString("703adcbe76c94fd59679ae32a04d8329");
+const QString ESI_manager::SecretKey     = QString("EdMrlKYJnMgq8eZIAxlHUWJDol3ikywjX25T6xCY");
 
 //Конструктор
 ESI_manager::ESI_manager(QObject *parent) : QObject(parent)
 {
-    Net_Manager = new QNetworkAccessManager();
+    Net_Manager = new QNetworkAccessManager(parent);
 
     QObject::connect(this->Net_Manager, SIGNAL(finished(QNetworkReply*)),                   this, SLOT(GetResponse(QNetworkReply*)),                           Qt::UniqueConnection);
     QObject::connect(this->Net_Manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(slotSSLErrorManeger(QNetworkReply*, QList<QSslError>)), Qt::UniqueConnection);
@@ -74,7 +76,7 @@ static QString ValueTypeParm(ESI_manager::TypeParm Type)
     }
 }
 
-//Установка параметров для запроса
+//Установка параметров запроса для получения токена по SSO
 void ESI_manager::Set_Request(ESI_manager::TypeHead Type)
 {
 
@@ -88,13 +90,28 @@ void ESI_manager::Set_Request(ESI_manager::TypeHead Type)
     Request.setHeader( QNetworkRequest::ContentTypeHeader, tConType );
 
 
-    qDebug(logDebug()) << "Формирование POST сообщения с параметрами: ";
-    qDebug(logDebug()) << "HOST: " << QUrl( SSOAddress+"/token" ).toString();
-    qDebug(logDebug()) << "Строка авторизации в BASE64: " << QString("Basic "+AuthStr.toLatin1().toBase64()).toUtf8();
-    qDebug(logDebug()) << "ContentTypeHeader:" << Request.header(QNetworkRequest::KnownHeaders::ContentTypeHeader).toString();
-    qDebug(logDebug()) << "UserAgentHeader:" << Request.header(QNetworkRequest::KnownHeaders::UserAgentHeader).toString();
-    qDebug(logDebug()) << "Authorization: " << Request.rawHeader("Authorization");
+    qDebug(logDebug()) << "Формирование сообщения с параметрами:";
+    qDebug(logDebug()) << "HOST:              " << Request.url().toString();
+    qDebug(logDebug()) << "ContentTypeHeader: " << Request.header(QNetworkRequest::KnownHeaders::ContentTypeHeader).toString();
+    qDebug(logDebug()) << "UserAgentHeader:   " << Request.header(QNetworkRequest::KnownHeaders::UserAgentHeader).toString();
+    qDebug(logDebug()) << "Authorization:     " << Request.rawHeader("Authorization");
 
+}
+
+//Заполнение общего запроса
+void ESI_manager::Set_Request(QString Host, QString TypeAuth, QString Token, ESI_manager::TypeHead Type = TypeJson)
+{
+    QString tConType = ValueContentType(Type);
+
+    //Установили данные загаловка
+    Request.setUrl(QUrl( Host ));
+    Request.setRawHeader("Authorization", QString(TypeAuth.trimmed()+" "+Token.trimmed());
+    Request.setHeader( QNetworkRequest::ContentTypeHeader, tConType );
+
+    qDebug(logDebug()) << "Формирование сообщения с параметрами:";
+    qDebug(logDebug()) << "HOST:              " << Request.url().toString();
+    qDebug(logDebug()) << "ContentTypeHeader: " << Request.header(QNetworkRequest::KnownHeaders::ContentTypeHeader).toString();
+    qDebug(logDebug()) << "Authorization:     " << Request.rawHeader("Authorization");
 }
 
 //Заполнение тела запроса
@@ -116,9 +133,19 @@ void ESI_manager::SendPost()
     QObject::connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(slotError(QNetworkReply::NetworkError)), Qt::UniqueConnection);
     QObject::connect(reply, SIGNAL(sslErrors(QList<QSslError>)),        this, SLOT(slotSSLError(QList<QSslError>)),         Qt::UniqueConnection);
 
-    qDebug(logDebug) << "Вернувшийся код запроса2: " << this->Request.attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
 }
 
+//Отправка GET запроса
+void ESI_manager::SendGet()
+{
+
+    QNetworkReply *reply = this->Net_Manager->get(this->Request);
+
+    //Соединение сигнала ошибок с слотом обработки ошибки при отправке
+    QObject::connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(slotError(QNetworkReply::NetworkError)), Qt::UniqueConnection);
+    QObject::connect(reply, SIGNAL(sslErrors(QList<QSslError>)),        this, SLOT(slotSSLError(QList<QSslError>)),         Qt::UniqueConnection);
+
+}
 
 //Слот для приема номера ошибки при отправке POST сообщения
 void ESI_manager::slotError(QNetworkReply::NetworkError tcode)
@@ -147,13 +174,15 @@ void ESI_manager::slotSSLErrorManeger(QNetworkReply * rep, QList<QSslError> list
     rep->deleteLater();
 }
 
+//Слот для приема ответа на запрос
 void ESI_manager::GetResponse(QNetworkReply *reply)
 {
-    QByteArray *DataPOSTToken = new QByteArray(reply->readAll());
-    QString tmp = DataPOSTToken->data();
 
-    qDebug(logDebug) << "Ответ сервера на сообщение: "+tmp;
+    if(!reply->error())
+    {
+        emit ESI_manager::ReturnData(reply->readAll());
+    }
 
     reply->deleteLater();
-    emit ESI_manager::ReturnData(tmp);
+
 }

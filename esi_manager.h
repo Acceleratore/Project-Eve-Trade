@@ -31,6 +31,8 @@ public:
     static const QString RedirectURL;
     static const QString ClientID;
     static const QString SecretKey;
+    static const QString VerifuAddress;
+    static const QString ESIAddress;
 
     //Значения типов контента
     enum TypeHead {
@@ -55,11 +57,12 @@ public:
     ~ESI_manager();
 
     void Set_sslConfig(QSsl::SslProtocol protocol);
-    void Set_Request(ESI_manager::TypeHead Type);
+    void Set_Request(ESI_manager::TypeHead Type);                    //Для авторизации по SSO
+    void Set_Request(QString Host, QString TypeAuth, QString Token); //Для отправки запроса с авторизацией, но без выбора типа возвращаемых данных
     void Set_Query(ESI_manager::GrantType Type, ESI_manager::TypeParm Parm1, QString Value1);
     void Set_QueryJson();
     void SendPost();
-
+    void SendGet();
 
 public slots:
     void slotError(QNetworkReply::NetworkError tcode);
@@ -67,7 +70,7 @@ public slots:
     void slotSSLErrorManeger(QNetworkReply*, QList<QSslError>);
     void GetResponse(QNetworkReply *reply);
 signals:
-    void ReturnData(QString tStr);
+    void ReturnData(QByteArray tBArr);
 };
 
 #endif // ESI_MANAGER_H
