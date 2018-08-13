@@ -55,11 +55,11 @@ void ManageCharacters::RefreshData(QUserDBWork tDB)
 
 void AddCharacter(int CharID, QString CharName, QString CharToken)
 {
-    QSqlDatabase db = QSqlDatabase::database( "MainDB" );
+    QUserDBWork db = QUserDBWork( "QSQLITE", "MainDB" );
 
     if (db.FindCharacterID(CharID))
     {
-        db.UpdateCharacter();
+        db.UpdateCharacter(CharID, CharName, CharToken);
     } else
-        db.InsertCharacter();
+        db.InsertCharacter(CharID, CharName, CharToken);
 }

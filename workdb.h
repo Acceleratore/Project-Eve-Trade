@@ -10,7 +10,7 @@ class QUserDBWork
     QSqlDatabase db;
 
 public:
-    QUserDBWork(QString _NameDriver);
+    QUserDBWork(QString _NameDriver, QString _NameConnect);
     ~QUserDBWork();
     QSqlError InitDB (QString _NameDB);
     QSqlQuery GetListCharacters();

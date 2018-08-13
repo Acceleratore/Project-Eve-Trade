@@ -19,13 +19,13 @@ class MainWindow : public QMainWindow
     QString TempToken;
     QString RefreshToken;
     QString TypeToken;
+    ESI_manager *ManagerESI;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
 private:
-    ESI_manager *ManagerESI = nullptr;
     Ui::MainWindow *ui;
     void InitialLoginWindow();
     void GetClientIDByToken();

@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     //Инициализация менеджера запросов
-    this->ManagerESI = ESI_manager(this);
+    this->ManagerESI = new ESI_manager(this);
 
 
     /* Блок подключения сигналов и слотов */
@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
         qCritical(logCritical()) << "Не найден драйвер для работы базы данных. Для работы необходим SQLITE драйвер!";
     }
 
-    QUserDBWork MainDB("QSQLITE");
+    QUserDBWork MainDB("QSQLITE", "MainDB");
 
     //Инициализация ДБ
     QSqlError err = MainDB.InitDB(PathToDir+"/ProjectEVET.sqlite");
@@ -129,7 +129,7 @@ void MainWindow::GetCharactersData(QByteArray tBArr)
     {
         QJsonObject jObj = JsonDoc.object();
 
-        int     CharacterID   = QString(jObj.value("CharacterID").toInt());
+        int     CharacterID   = jObj.value("CharacterID").toInt();
         QString CharacterName = QString(jObj.value("CharacterName").toString());
 
         emit TransfCharacterData(CharacterID, CharacterName, this->RefreshToken);
