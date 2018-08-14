@@ -145,6 +145,6 @@ void MainWindow::GetCharactersData(QByteArray tBArr)
 void MainWindow::GetClientIDByToken()
 {
     ManagerESI->Set_sslConfig(QSsl::AnyProtocol);
-    ManagerESI->Set_Request(ESI_manager::VerifuAddress, this->TypeToken, this->TempToken);
+    ManagerESI->Set_Request(ESI_manager::VerifuAddress, this->TypeToken, this->TempToken, ESI_manager::TypeJson);
     ManagerESI->SendGet();
 }

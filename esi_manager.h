@@ -58,8 +58,13 @@ public:
 
     void Set_sslConfig(QSsl::SslProtocol protocol);
     void Set_Request(ESI_manager::TypeHead Type);                    //Для авторизации по SSO
-    void Set_Request(QString Host, QString TypeAuth, QString Token); //Для отправки запроса с авторизацией, но без выбора типа возвращаемых данных
-    void Set_Query(ESI_manager::GrantType Type, ESI_manager::TypeParm Parm1, QString Value1);
+    void Set_Request(QString Host, QString TypeAuth, QString Token, ESI_manager::TypeHead Type); //Для отправки запроса с авторизацией, но без выбора типа возвращаемых данных
+
+    void Set_Query(ESI_manager::GrantType Type,
+                   ESI_manager::TypeParm Parm1,
+                   QString Value1
+                  );
+
     void Set_QueryJson();
     void SendPost();
     void SendGet();

@@ -99,13 +99,13 @@ void ESI_manager::Set_Request(ESI_manager::TypeHead Type)
 }
 
 //Заполнение общего запроса
-void ESI_manager::Set_Request(QString Host, QString TypeAuth, QString Token, ESI_manager::TypeHead Type = TypeJson)
+void ESI_manager::Set_Request(QString Host, QString TypeAuth, QString Token, ESI_manager::TypeHead Type)
 {
     QString tConType = ValueContentType(Type);
 
     //Установили данные загаловка
     Request.setUrl(QUrl( Host ));
-    Request.setRawHeader("Authorization", QString(TypeAuth.trimmed()+" "+Token.trimmed());
+    Request.setRawHeader("Authorization", "Bearer" + QString(TypeAuth.trimmed()+" "+Token.trimmed()).toLatin1().toBase64()); //Не доработал логику!!!
     Request.setHeader( QNetworkRequest::ContentTypeHeader, tConType );
 
     qDebug(logDebug()) << "Формирование сообщения с параметрами:";

@@ -53,7 +53,7 @@ void QUserDBWork::InsertCharacter(int CharID, QString CharName, QString Token)
     QSqlQuery _Query(this->db);
     bool FlagQuery;
 
-    _Query.prepare("INSERT INTO Characters (CharacterID, Name, Token) VALUES (:id, :name, :token)";
+    _Query.prepare("INSERT INTO Characters (CharacterID, Name, Token) VALUES (:id, :name, :token)");
 
     _Query.bindValue(":id",    CharID  );
     _Query.bindValue(":name",  CharName);
@@ -73,7 +73,7 @@ void QUserDBWork::UpdateCharacter(int CharID, QString CharName, QString Token)
     QSqlQuery _Query(this->db);
     bool FlagQuery;
 
-    _Query.prepare("UPDATE Characters SET Name = :name, Token = :token WHERE CharacterID = :id";
+    _Query.prepare("UPDATE Characters SET Name = :name, Token = :token WHERE CharacterID = :id");
 
     _Query.bindValue(":id",    CharID  );
     _Query.bindValue(":name",  CharName);
