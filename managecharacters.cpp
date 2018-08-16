@@ -53,7 +53,7 @@ void ManageCharacters::RefreshData(QUserDBWork tDB)
     this->SetDataInCharTable(tDB.GetListCharacters());
 }
 
-void AddCharacter(int CharID, QString CharName, QString CharToken)
+void ManageCharacters::AddCharacter(int CharID, QString CharName, QString CharToken)
 {
     QUserDBWork db = QUserDBWork( "QSQLITE", "MainDB" );
 
