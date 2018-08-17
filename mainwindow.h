@@ -28,13 +28,13 @@ public:
 private:
     Ui::MainWindow *ui;
     void InitialLoginWindow();
-    void GetClientIDByToken();
 
 private slots:
     void on_actionManage_characters_triggered();
     void on_LoginSSOButton_clicked();
     void GetAuthData(QByteArray tBArr);
     void GetCharactersData(QByteArray tBArr);
+    void GetClientIDByToken();
 
 signals:
     void NewToken();

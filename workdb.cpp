@@ -3,14 +3,14 @@
 //Конструктор класса
 QUserDBWork::QUserDBWork(QString _NameDriver, QString _NameConnect)
 {
-
+/*
     if (!this->db.isOpen())
     {
         this->db = QSqlDatabase::cloneDatabase(QSqlDatabase::database( _NameConnect ), "Clone"+_NameConnect );
         if (!this->db.open())
             qDebug(logCritical()) << "Не удалось открыть клонированное подключение к базе данных " << _NameConnect;
-    } else
-        this->db = QSqlDatabase::addDatabase(_NameDriver, _NameConnect);
+    } else*/
+        this->db = QSqlDatabase::addDatabase(_NameDriver, "MainDB"/*_NameConnect*/);
 }
 
 //Деструктор класса

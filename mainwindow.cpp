@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if (err.type() != QSqlError::NoError)
     {
         QMessageBox::critical(this, "Неудачная попытка инициализации базы данных", "Не удалось инициализаровать базу данных, ошибка №: " + err.text());
-        qCritical(logCritical()) << "Не удалось инициализаровать базу данных, ошибка №: " + err.text();
+        qCritical(logCritical()) << "Не удалось инициализаровать базу данных, ошибка №: " << err.text();
         return;
     }
 
