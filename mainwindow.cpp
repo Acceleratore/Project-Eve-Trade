@@ -144,6 +144,7 @@ void MainWindow::GetCharactersData(QByteArray tBArr)
 //Получить ID персонажа по временному токену
 void MainWindow::GetClientIDByToken()
 {
+    qDebug(logDebug()) << QString("Получение ID персонажа");
     ManagerESI->Set_sslConfig(QSsl::AnyProtocol);
     ManagerESI->Set_Request(ESI_manager::VerifuAddress, this->TypeToken, this->TempToken, ESI_manager::TypeJson);
     ManagerESI->SendGet();
