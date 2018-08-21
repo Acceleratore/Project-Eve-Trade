@@ -16,7 +16,7 @@ class WebSSOLogin : public QDialog
     Q_OBJECT
 
 public:
-    explicit WebSSOLogin(QWidget *parent = 0);
+    explicit WebSSOLogin(QWidget *parent = nullptr);
     ~WebSSOLogin();
 public slots:
     void ShowLogin();

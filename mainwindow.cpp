@@ -37,8 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect( this, SIGNAL(NewToken()),                   this,       SLOT(GetClientIDByToken()),     Qt::AutoConnection );
     connect( this, SIGNAL(UpdateCharacter(QUserDBWork)), &wMC,       SLOT(RefreshData(QUserDBWork)), Qt::AutoConnection );
-    connect( this, SLOT(GetCharactersData(QByteArray)),  ManagerESI, SIGNAL(ReturnData(QByteArray)), Qt::UniqueConnection);
-
+    connect( ManagerESI, SIGNAL(ReturnData(QByteArray)), this,       SLOT(GetCharactersData(QByteArray)) , Qt::UniqueConnection);
     connect( this, SIGNAL(TransfCharacterData(int,QString,QString)), &wMC, SLOT(AddCharacter(int,QString,QString)), Qt::UniqueConnection);
 
     /* Окончание блока подключения сигналов и слотов */

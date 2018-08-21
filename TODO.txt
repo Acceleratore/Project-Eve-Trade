@@ -5,7 +5,7 @@
 Подумать о ее уменьшении и оптимизации
 
 WebSSO::ReturnData ->
-MainWindow::GetAutData (emit NewToken) -> //Сигнал не сработал
-MainWindow::GetClientIDByToken (ESI_Manager emit ReturnData) ->
+MainWindow::GetAutData (emit NewToken) ->
+MainWindow::GetClientIDByToken (ESI_Manager emit ReturnData) -> //Исправлена - проверить, реализовать передачу типа токена через параметр
 MainWindow::GetCharactersData (emit TransfCharacterData) ->
 ManagerCharacter::AddCharacter

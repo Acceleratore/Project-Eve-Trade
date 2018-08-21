@@ -14,7 +14,7 @@ class ManageCharacters : public QDialog
 {
     Q_OBJECT
 public:
-    explicit ManageCharacters(QWidget *parent = 0);
+    explicit ManageCharacters(QWidget *parent = nullptr);
     ~ManageCharacters();
     void SetDataInCharTable(QSqlQuery _Query);
 
