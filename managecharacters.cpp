@@ -55,7 +55,9 @@ void ManageCharacters::RefreshData(QUserDBWork tDB)
 
 void ManageCharacters::AddCharacter(int CharID, QString CharName, QString CharToken)
 {
-    QUserDBWork db = QUserDBWork( "QSQLITE", "MainDB" );
+    QUserDBWork db = QUserDBWork();
+
+    db.CloneDB("MainDB");
 
     if (db.FindCharacterID(CharID))
     {

@@ -11,7 +11,9 @@ class QUserDBWork
 
 public:
     QUserDBWork(QString _NameDriver, QString _NameConnect);
+    QUserDBWork();
     ~QUserDBWork();
+    void CloneDB(QString _NameConnect);
     QSqlError InitDB (QString _NameDB);
     QSqlQuery GetListCharacters();
     bool FindCharacterID(int CharID);

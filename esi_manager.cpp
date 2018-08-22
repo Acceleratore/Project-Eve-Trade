@@ -105,7 +105,7 @@ void ESI_manager::Set_Request(QString Host, QString TypeAuth, QString Token, ESI
 
     //Установили данные загаловка
     Request.setUrl(QUrl( Host ));
-    Request.setRawHeader("Authorization", "Bearer " + QString(Token.trimmed()).toLatin1() ); //Не доработал логику!!!
+    Request.setRawHeader("Authorization", QString(TypeAuth + " " + Token.trimmed()).toLatin1() /*"Bearer " + QString(Token.trimmed()).toLatin1()*/ );
     Request.setHeader( QNetworkRequest::ContentTypeHeader, tConType );
 
     qDebug(logDebug()) << "Формирование сообщения с параметрами:";

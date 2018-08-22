@@ -3,20 +3,33 @@
 //Конструктор класса
 QUserDBWork::QUserDBWork(QString _NameDriver, QString _NameConnect)
 {
-/*
-    if (!this->db.isOpen())
+
+    /*if (this->db.isOpen())
     {
         this->db = QSqlDatabase::cloneDatabase(QSqlDatabase::database( _NameConnect ), "Clone"+_NameConnect );
         if (!this->db.open())
             qDebug(logCritical()) << "Не удалось открыть клонированное подключение к базе данных " << _NameConnect;
     } else*/
-        this->db = QSqlDatabase::addDatabase(_NameDriver, "MainDB"/*_NameConnect*/);
+        this->db = QSqlDatabase::addDatabase(_NameDriver, _NameConnect);
+}
+
+QUserDBWork::QUserDBWork()
+{
+    //...
 }
 
 //Деструктор класса
 QUserDBWork::~QUserDBWork()
 {
     this->db.close();
+}
+
+void QUserDBWork::CloneDB(QString _NameConnect)
+{
+    this->db = QSqlDatabase::cloneDatabase(QSqlDatabase::database( _NameConnect ), "Clone"+_NameConnect );
+
+    if (!this->db.open())
+        qDebug(logCritical()) << "Не удалось открыть клонированное подключение к базе данных " << _NameConnect;
 }
 
 //Инициализация базы данных
@@ -45,7 +58,9 @@ bool QUserDBWork::FindCharacterID(int CharID)
 {
     QSqlQuery _Query(this->db);
 
-    return _Query.exec("SELECT * FROM \"Characters\" WHERE CharacterID = " + QString::number(CharID));
+    _Query.exec("SELECT * FROM \"Characters\" WHERE CharacterID = " + QString::number(CharID));
+
+    return _Query.isNull(0);
 }
 
 void QUserDBWork::InsertCharacter(int CharID, QString CharName, QString Token)
