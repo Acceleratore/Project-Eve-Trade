@@ -19,7 +19,7 @@ class MainWindow : public QMainWindow
     QString TempToken;
     QString RefreshToken;
     QString TypeToken;
-    ESI_manager *ManagerESI;
+    ESI_manager *ManagerESI = nullptr;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
@@ -35,6 +35,8 @@ private slots:
     void GetAuthData(QByteArray tBArr);
     void GetCharactersData(QByteArray tBArr);
     void GetClientIDByToken();
+    //void RefreshListChar();
+    void UpdateStatusBar(QString _text);
 
 signals:
     void NewToken();

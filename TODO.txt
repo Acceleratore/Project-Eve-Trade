@@ -1,11 +1,27 @@
 1. WebSSOLogin - не статичный параметр State!
-2. Доработать процедуру получение ID персонажа и заполнения данных о нем в БД.
+2. Получение изображений (QImage) через АПИ, реализация получения разных данных от менеджера ESI.
 
 3. Схема вызовов для передачи данных о залогиненом персонаже по SSO
 Подумать о ее уменьшении и оптимизации
 
 WebSSO::ReturnData ->
 MainWindow::GetAutData (emit NewToken) ->
-MainWindow::GetClientIDByToken (ESI_Manager emit ReturnData) -> //Исправлена - проверить, реализовать передачу типа токена через параметр
+MainWindow::GetClientIDByToken (ESI_Manager emit ReturnData) ->
 MainWindow::GetCharactersData (emit TransfCharacterData) ->
 ManagerCharacter::AddCharacter
+
+
+4. Определение какие данные были переданы для получения
+
+set_SSLConfig
+Set_request
+set query
+
+Send_post
+Send_Get
+
+
+GetResponse -> emit ReturnData
+
+sloterror
+slotSSLError

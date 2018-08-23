@@ -28,15 +28,29 @@ MainWindow::MainWindow(QWidget *parent) :
     qDebug(logDebug()) << "Директория до папки с проектом установлена в: "+PathToDir;
     /* ОКОНЧАНИЯ БЛОКА ИНФОРМАЦИИ ОТЛАДКИ */
 
+/*
+    QLabel *tmsg = new QLabel("Test Label");
+    tmsg->setAlignment(Qt::AlignRight);
+    ui->statusBar->addPermanentWidget(tmsg, 1);
+
+
+    QLabel *tmsg1 = new QLabel("Test Label 2");
+    tmsg1->setAlignment(Qt::AlignRight);
+    ui->statusBar->addPermanentWidget(tmsg1, 1);
+
+
+    QLabel *tmsg2 = new QLabel("Test Label 3");
+    tmsg2->setAlignment(Qt::AlignRight);
+    ui->statusBar->addPermanentWidget(tmsg2, 1);
+*/
 
     //Инициализация менеджера запросов
     this->ManagerESI = new ESI_manager(this);
 
-
     /* Блок подключения сигналов и слотов */
 
-    connect( this, SIGNAL(NewToken()),                   this,       SLOT(GetClientIDByToken()),     Qt::AutoConnection );
-    connect( this, SIGNAL(UpdateCharacter(QUserDBWork)), &wMC,       SLOT(RefreshData(QUserDBWork)), Qt::AutoConnection );
+    connect( this, SIGNAL(NewToken()),                   this,       SLOT(GetClientIDByToken()),           Qt::AutoConnection );
+    connect( this, SIGNAL(UpdateCharacter(QUserDBWork)), &wMC,       SLOT(RefreshData(QUserDBWork)),       Qt::AutoConnection );
     connect( ManagerESI, SIGNAL(ReturnData(QByteArray)), this,       SLOT(GetCharactersData(QByteArray)) , Qt::UniqueConnection);
     connect( this, SIGNAL(TransfCharacterData(int,QString,QString)), &wMC, SLOT(AddCharacter(int,QString,QString)), Qt::UniqueConnection);
 
@@ -64,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //Заполнение таблицы персонажей
     emit UpdateCharacter(MainDB);
 
-    InitialLoginWindow();//Обрати внимание!!!???
+    //InitialLoginWindow();//Обрати внимание!!!???
 
 }
 
@@ -147,4 +161,9 @@ void MainWindow::GetClientIDByToken()
     ManagerESI->Set_sslConfig(QSsl::AnyProtocol);
     ManagerESI->Set_Request(ESI_manager::VerifuAddress, this->TypeToken, this->TempToken, ESI_manager::TypeJson);
     ManagerESI->SendGet();
+}
+
+void MainWindow::UpdateStatusBar(QString _text)
+{
+    ui->statusBar->showMessage(_text, 0);
 }

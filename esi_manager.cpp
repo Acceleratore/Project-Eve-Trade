@@ -3,6 +3,7 @@
 const QString ESI_manager::ESIAddress    = QString("https://esi.evetech.net/latest/");
 const QString ESI_manager::VerifuAddress = QString("https://esi.tech.ccp.is/verify/");
 const QString ESI_manager::SSOAddress    = QString("https://login.eveonline.com/oauth");
+const QString ESI_manager::ImageAddress  = QString("https://image.eveonline.com/");
 const QString ESI_manager::ReponseType   = QString("code");
 const QString ESI_manager::RedirectURL   = QString("http://localhost:755/");
 const QString ESI_manager::ClientID      = QString("703adcbe76c94fd59679ae32a04d8329");
@@ -104,8 +105,8 @@ void ESI_manager::Set_Request(QString Host, QString TypeAuth, QString Token, ESI
     QString tConType = ValueContentType(Type);
 
     //Установили данные загаловка
-    Request.setUrl(QUrl( Host ));
-    Request.setRawHeader("Authorization", QString(TypeAuth + " " + Token.trimmed()).toLatin1() /*"Bearer " + QString(Token.trimmed()).toLatin1()*/ );
+    Request.setUrl( QUrl( Host ) );
+    Request.setRawHeader( "Authorization", QString(TypeAuth + " " + Token.trimmed()).toLatin1() );
     Request.setHeader( QNetworkRequest::ContentTypeHeader, tConType );
 
     qDebug(logDebug()) << "Формирование сообщения с параметрами:";

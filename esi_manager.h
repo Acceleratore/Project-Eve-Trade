@@ -33,6 +33,7 @@ public:
     static const QString SecretKey;
     static const QString VerifuAddress;
     static const QString ESIAddress;
+    static const QString ImageAddress;
 
     //Значения типов контента
     enum TypeHead {
@@ -52,7 +53,6 @@ public:
         Refresh //Обновление токена
     };
 
-    //ESI_manager();
     explicit ESI_manager(QObject *parent = nullptr);
     ~ESI_manager();
 

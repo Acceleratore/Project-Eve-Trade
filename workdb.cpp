@@ -3,14 +3,7 @@
 //Конструктор класса
 QUserDBWork::QUserDBWork(QString _NameDriver, QString _NameConnect)
 {
-
-    /*if (this->db.isOpen())
-    {
-        this->db = QSqlDatabase::cloneDatabase(QSqlDatabase::database( _NameConnect ), "Clone"+_NameConnect );
-        if (!this->db.open())
-            qDebug(logCritical()) << "Не удалось открыть клонированное подключение к базе данных " << _NameConnect;
-    } else*/
-        this->db = QSqlDatabase::addDatabase(_NameDriver, _NameConnect);
+    this->db = QSqlDatabase::addDatabase(_NameDriver, _NameConnect);
 }
 
 QUserDBWork::QUserDBWork()
@@ -60,7 +53,7 @@ bool QUserDBWork::FindCharacterID(int CharID)
 
     _Query.exec("SELECT * FROM \"Characters\" WHERE CharacterID = " + QString::number(CharID));
 
-    return _Query.isNull(0);
+    return (!_Query.isNull(0));
 }
 
 void QUserDBWork::InsertCharacter(int CharID, QString CharName, QString Token)
