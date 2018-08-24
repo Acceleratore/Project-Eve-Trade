@@ -78,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //Заполнение таблицы персонажей
     emit UpdateCharacter(MainDB);
 
-    //InitialLoginWindow();//Обрати внимание!!!???
+    InitialLoginWindow();//Обрати внимание!!!???
 
 }
 

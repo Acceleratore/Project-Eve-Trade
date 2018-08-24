@@ -13,6 +13,8 @@
 #include <QList>
 #include <QSslError>
 #include <QUrlQuery>
+#include <QList>
+#include <QPair>
 #include "logger.h"
 
 class ESI_manager : public QObject
@@ -38,7 +40,8 @@ public:
     //Значения типов контента
     enum TypeHead {
         TypeJson,       //JSON данные
-        TypeURLENCODED  //Стандартные
+        TypeURLENCODED,
+        TypeIMAGEJPG    //Изображение JPEG
     };
 
     //Тип доступа
@@ -75,7 +78,7 @@ public slots:
     void slotSSLErrorManeger(QNetworkReply*, QList<QSslError>);
     void GetResponse(QNetworkReply *reply);
 signals:
-    void ReturnData(QByteArray tBArr);
+    void ReturnData(QByteArray tBArr, QList<QPair<QByteArray, QByteArray>> tList);
 };
 
 #endif // ESI_MANAGER_H

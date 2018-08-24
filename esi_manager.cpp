@@ -46,6 +46,8 @@ static QString ValueContentType(ESI_manager::TypeHead Type)
         return QString("application/x-www-form-urlencoded");
     case ESI_manager::TypeJson:
         return QString("application/json");
+    case ESI_manager::TypeIMAGEJPG:
+        return QString("image/jpeg");
     default:
         return QString("application/x-www-form-urlencoded");
     }
@@ -178,7 +180,7 @@ void ESI_manager::slotSSLErrorManeger(QNetworkReply * rep, QList<QSslError> list
 //Слот для приема ответа на запрос
 void ESI_manager::GetResponse(QNetworkReply *reply)
 {
-
+    qDebug(logDebug()) << "Заголовок ответа: " << reply->rawHeaderPairs();
     if(!reply->error())
     {
         emit ESI_manager::ReturnData(reply->readAll());

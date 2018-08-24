@@ -11,17 +11,6 @@ MainWindow::GetCharactersData (emit TransfCharacterData) ->
 ManagerCharacter::AddCharacter
 
 
-4. ќпределение какие данные были переданы дл€ получени€
-
-set_SSLConfig
-Set_request
-set query
-
-Send_post
-Send_Get
-
-
-GetResponse -> emit ReturnData
-
-sloterror
-slotSSLError
+4. ќпределение какие данные были переданы дл€ получени€.
+   Ќужен инструмент дл€ анализировани€ заголовка ответа.
+   https://ru.wikipedia.org/wiki/—писок_MIME-типов
